@@ -27,22 +27,27 @@ class TaskManager(Node):
                 self.task_list[i][3] = np.random.randint(0, 8)
 
     def request_task_callback(self, request, response):
-        # If we run out of tasks, generate a new batch
-        if self.task_index >= len(self.task_list):
-            self.create_tasks()
-            self.task_index = 0
+        if request.msg =='Request Task':
+            # If we run out of tasks, generate a new batch
+            if self.task_index >= len(self.task_list):
+                self.create_tasks()
+                self.task_index = 0
 
-        # Map their logic to your .srv fields
-        current_task = self.task_list[self.task_index]
-        response.pickup_x = int(current_task[0])
-        response.pickup_y = int(current_task[1])
-        response.dropoff_x = int(current_task[2])
-        response.dropoff_y = int(current_task[3])
-        response.success = True  # Crucial for your VehicleNode state transition
+            # Map their logic to your .srv fields
+            current_task = self.task_list[self.task_index]
+            response.pickup_x = int(current_task[0])
+            response.pickup_y = int(current_task[1])
+            response.dropoff_x = int(current_task[2])
+            response.dropoff_y = int(current_task[3])
+            response.success = True  # Crucial for your VehicleNode state transition
         
-        self.get_logger().info(f'Assigned Task {self.task_index}: Pick up at [{response.pickup_x}, {response.pickup_y}]')
+            self.get_logger().info(f'Assigned Task {self.task_index}: Pick up at [{response.pickup_x}, {response.pickup_y}]')
         
-        self.task_index += 1
+            self.task_index += 1
+
+        if request.msg =='Task Completed':
+            self.task_completed+=1
+            self.get_logger().info(f'Task Completed: {self.task_completed}')
         return response
 
 def main(args=None):
