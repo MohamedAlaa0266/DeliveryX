@@ -47,6 +47,9 @@ class VehicleNode(Node):
         elif self.state == "FINISHED":
             self.get_logger().info("Task completed")
             self.state = "IDLE"
+            req = TaskRequest.Request()
+            req.msg='Task Completed'
+            self.send_req(req)
 
         elif self.state == "WAITING" and self.task:
             target = self.task['pickup'] if self.previous_state == "MOVING_TO_PICKUP" else self.task['dropoff']
@@ -67,9 +70,15 @@ class VehicleNode(Node):
         if not self.task_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().error(f'Task service not available, position: {self.position}')
             return
+    ###############
         req = TaskRequest.Request()
+        req.msg='Request Task'    
+        self.send_req(req)
+        
+    def send_req(self,req):
         future = self.task_client.call_async(req)
         future.add_done_callback(self.task_callback)
+    ##############
 
     def task_callback(self, future):
         res = future.result()
