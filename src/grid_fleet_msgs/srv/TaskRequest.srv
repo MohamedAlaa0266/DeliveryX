@@ -1,3 +1,4 @@
+string msg
 ---
 int32 pickup_x
 int32 pickup_y
